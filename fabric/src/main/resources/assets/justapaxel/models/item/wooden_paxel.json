@@ -1,0 +1,14 @@
+{
+	"parent": "minecraft:item/handheld",
+	"textures": {
+		"layer0": "justapaxel:item/wooden_paxel"
+	},
+	"overrides": [
+		{
+			"predicate": {
+				"justapaxel:hoe": 1.0
+			},
+			"model": "justapaxel:item/wooden_paxel_mode_hoe"
+        }        
+	]
+}

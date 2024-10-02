@@ -1,0 +1,6 @@
+{
+	"parent": "minecraft:item/handheld",
+	"textures": {
+		"layer0": "justapaxel:item/iron_paxel_mode_hoe"
+	}
+}

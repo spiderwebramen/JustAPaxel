@@ -1,0 +1,10 @@
+{
+    "item.justapaxel.wooden_paxel": "Wooden Paxel",
+    "item.justapaxel.stone_paxel": "Stone Paxel",
+    "item.justapaxel.golden_paxel": "Golden Paxel",
+    "item.justapaxel.iron_paxel": "Iron Paxel",
+    "item.justapaxel.diamond_paxel": "Diamond Paxel",
+    "item.justapaxel.netherite_paxel": "Netherite Paxel",
+
+    "notification.justapaxel.switch_mode": "Switched to %1$s mode."
+}
