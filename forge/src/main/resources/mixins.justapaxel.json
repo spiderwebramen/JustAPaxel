@@ -1,5 +1,10 @@
 {
     "required": "true",
     "compatibilityLevel": "JAVA_17",
-    "package": "com.heebin.justapaxel.mixins"
+    "package": "com.heebin.justapaxel.mixins",
+    "mixins": [
+        "FTBUltimineMixin",
+        "RightClickHandlersMixin",
+        "IRightClickHandlersInvokers"
+    ]
 }

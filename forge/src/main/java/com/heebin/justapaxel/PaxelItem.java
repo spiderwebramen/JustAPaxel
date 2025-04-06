@@ -10,8 +10,10 @@ import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraftforge.common.ToolAction;
@@ -26,6 +28,7 @@ import net.minecraft.sounds.SoundSource;
 
 public class PaxelItem extends DiggerItem {
     private static final String tagName = "ToolMode";
+    private BlockState useOnBlockModifiedState = null; // this shit relies on the fact that useOn() triggers before use()
 
     public static enum PaxelMode {
         SHOVEL,
@@ -50,7 +53,7 @@ public class PaxelItem extends DiggerItem {
         if (context.getClickedFace() != Direction.DOWN && blockState.getBlock() instanceof CampfireBlock
                 && blockState.getValue(CampfireBlock.LIT)) {
             if (!level.isClientSide()) {
-                level.levelEvent((Player)null, 1009, blockPos, 0); // 1009 = fire extinguish event from LevelRenderer
+                level.levelEvent((Player) null, LevelEvent.SOUND_EXTINGUISH_FIRE, blockPos, 0); // 1009 = fire extinguish event from LevelEvent/LevelRenderer
             }
 
             CampfireBlock.dowse(player, level, blockPos, blockState);
@@ -65,13 +68,15 @@ public class PaxelItem extends DiggerItem {
         if (blockModifiedState == null) {
             blockModifiedState = blockState.getToolModifiedState(context, ToolActions.AXE_SCRAPE, false);
             sound = SoundEvents.AXE_SCRAPE;
-            if (blockModifiedState != null) level.levelEvent(player, 3005, blockPos, 0); // 3005 = axe scrape event
+            if (blockModifiedState != null)
+                level.levelEvent(player, 3005, blockPos, 0); // 3005 = axe scrape event
         }
 
         if (blockModifiedState == null) {
             blockModifiedState = blockState.getToolModifiedState(context, ToolActions.AXE_WAX_OFF, false);
             sound = SoundEvents.AXE_WAX_OFF;
-            if (blockModifiedState != null) level.levelEvent(player, 3004, blockPos, 0); // 3004 = axe wax off event
+            if (blockModifiedState != null)
+                level.levelEvent(player, 3004, blockPos, 0); // 3004 = axe wax off event
         }
 
         if (blockModifiedState == null) {
@@ -85,6 +90,7 @@ public class PaxelItem extends DiggerItem {
             }
         }
 
+        useOnBlockModifiedState = blockModifiedState;
         if (blockModifiedState == null) {
             return InteractionResult.PASS;
         }
@@ -94,7 +100,7 @@ public class PaxelItem extends DiggerItem {
         }
 
         if (!level.isClientSide()) {
-            level.setBlock(blockPos, blockModifiedState, 11);
+            level.setBlock(blockPos, blockModifiedState, Block.UPDATE_ALL_IMMEDIATE);
             level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(player, blockModifiedState));
 
             if (player != null) {
@@ -110,7 +116,9 @@ public class PaxelItem extends DiggerItem {
         ItemStack stack = player.getItemInHand(hand);
         BlockPos blockPos = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE).getBlockPos();
         BlockState blockState = level.getBlockState(blockPos);
-        if (player.isShiftKeyDown() && blockState.isAir()) {
+
+        // shift on air or non right-clickable block
+        if (player.isShiftKeyDown() && (blockState.isAir() || useOnBlockModifiedState == null)) {
             if (!level.isClientSide()) {
                 toggleMode(stack, player);
             }
@@ -169,5 +177,4 @@ public class PaxelItem extends DiggerItem {
 
         return PaxelMode.valueOf(compoundTag.getString(tagName));
     }
-
 }
